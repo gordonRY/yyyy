@@ -1,0 +1,134 @@
+
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>layuiAdmin 后台管理员</title>
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+  <link rel="stylesheet" href=" /admin/layuiadmin/layui/css/layui.css" media="all">
+  <link rel="stylesheet" href=" /admin/layuiadmin/style/admin.css" media="all">
+</head>
+<body>
+
+  <div class="layui-fluid">   
+    <div class="layui-card">
+      <div class="layui-form layui-card-header layuiadmin-card-header-auto">
+        <div class="layui-form-item">
+          <div class="layui-inline">
+            <label class="layui-form-label">开始时间：</label>
+            <div class="layui-input-block">
+              <input type="text" id="st" class="layui-input">
+            </div>
+          </div>
+          <div class="layui-inline">
+            <label class="layui-form-label">结束时间：</label>
+            <div class="layui-input-block">
+              <input type="text" id="et" class="layui-input">
+            </div>
+          </div>
+
+
+          <div class="layui-inline">
+            <button class="layui-btn layuiadmin-btn-admin" lay-submit lay-filter="LAY-user-back-search" id="time_s">
+              <i class="layui-icon layui-icon-search layuiadmin-button-btn"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+      
+      <div class="layui-card-body">
+
+<script type="text/html" id="toolbarcount">
+  <div class="layui-btn-container">
+    <button class="layui-btn layui-btn-sm" lay-event="getCheckData" id="info_counts">数据量</button>
+  </div>
+</script>
+ 
+        <table id="yyyy_info" lay-filter="yyyy_users"></table>  
+
+  
+      </div>
+    </div>
+  </div>
+
+ <script src=" /admin/layuiadmin/layui/layui.js"></script>  
+  <script>
+    layui.use(['laydate','table'], function(){
+      var laydate = layui.laydate;
+      var table = layui.table;
+      var $ = layui.$;
+      var apitoken=layui.sessionData('gordon');
+      var token=apitoken.token;
+      
+      //执行一个laydate实例
+      laydate.render({
+        elem: '#st',
+      });
+      laydate.render({
+        elem: '#et',
+      });
+
+  table.render({
+    elem: '#yyyy_info'
+    ,height: 'auto'
+    ,where:{"token":token}
+    ,url: 'http:///192.168.102.104/index.php/api/api/yyyy_info' //数据接口
+    //,page: false //开启分页
+    ,cols: [[ //表头
+      {field: 'name', title: '患者姓名', width:'20%', sort: true, fixed: 'left'}
+      ,{field: 'sex', title: '性别', width:'10%'}
+      ,{field: 'jzh', title: '就诊号', width:'20%'}
+      ,{field: 'idkh', title: '卡号', width:'20%'} 
+      ,{field: 'jytime', title: '时间', width:'20%',sort: true}
+      ,{field: 'isJF', title: '是否缴费', width:'10%', sort: true}
+    ]]
+    ,toolbar:"#toolbarcount"
+    ,done:function(res)
+    {
+      $("#info_counts").text('共有 '+res.count+' 条数据') 
+    }
+  });
+
+
+
+
+        $("#time_s").on("click",function()
+        {
+            var st=$("#st").val();
+            var et=$("#et").val();
+            if(st && et)
+            {
+                var fields={"st":st,"et":et,'token':token};
+               $.post('http:///192.168.102.104/index.php/api/api/yyyy_info',fields,function(res)
+                {
+                  console.log(res);
+                if(res.code==0)
+                {
+                    layer.msg("查询成功",{icon:1,time:1000},function()
+                   {
+                          table.reload("yyyy_info");
+                          $("#info_counts").text('共有 '+res.count+' 条数据')     
+                   });
+
+                }
+ 
+                },'json')
+            
+            }
+            else
+            {
+              layer.msg("搜索项不能为空！")
+            }
+
+
+        })
+
+    });
+
+  </script>
+</body>
+</html>
+

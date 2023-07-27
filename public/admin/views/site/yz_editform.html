@@ -1,0 +1,126 @@
+
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>长期医嘱修改</title>
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+  <link rel="stylesheet" href="/admin/layuiadmin/layui/css/layui.css" media="all">
+</head>
+<body>
+
+  <div class="layui-form" lay-filter="layuiadmin-form-role" id="layuiadmin-form-role" style="padding: 20px 30px 0 0;" enctype='multipart/form-data'>
+	<!-- 医嘱id开始 -->
+  <div class="layui-form-item">
+    <label class="layui-form-label">医嘱ID</label>
+    <div class="layui-input-block">
+      <input type="text" name="yzid"   readonly class="layui-input"  id="bou">  
+    </div>
+  </div>
+  <!-- 结束 -->
+
+  	<!-- 排序开始 -->
+  <div class="layui-form-item">
+    <label class="layui-form-label">排序</label>
+    <div class="layui-input-block">
+      <input type="text" name="orderby"  required lay-verify="required" placeholder="请输入排序" autocomplete="off" class="layui-input">
+    </div>
+  </div>
+  <!-- 结束 -->
+
+    <!-- 开单时间开始 -->
+  <div class="layui-form-item">
+    <label class="layui-form-label">开单时间</label>
+    <div class="layui-input-block">
+      <input type="text" name="dtInput" required   placeholder="请输入开单时间" autocomplete="off" class="layui-input">
+    </div>
+  </div>
+  <!-- 结束 -->
+
+<!-- 医嘱 开始 -->
+  <div class="layui-form-item">
+	<label class="layui-form-label">医嘱</label>
+	    <div class="layui-input-block"> 
+      <input type="text" name="feeName"  placeholder="请输入医嘱" autocomplete="off" class="layui-input">
+		</div>
+  </div>
+<!-- 结束 -->
+<!-- 计量 开始 -->
+  <div class="layui-form-item">
+  <label class="layui-form-label">计量</label>
+      <div class="layui-input-block"> 
+      <input type="text" name="Gg"  class="layui-input">
+    </div>
+  </div>
+<!-- 结束 -->
+<!-- 频次 开始 -->
+  <div class="layui-form-item">
+  <label class="layui-form-label">频次</label>
+      <div class="layui-input-block"> 
+      <input type="text" name="frequency"  class="layui-input">
+    </div>
+  </div>
+<!-- 结束 -->
+<!-- 首日起始时间 -->
+<div class="layui-form-item">
+  <label class="layui-form-label">起始时间</label>
+  <div class="layui-input-block">
+    <input type="text" name="Start_dt" required    class="layui-input">
+  </div>
+</div>
+<!-- 结束 -->
+<!-- 医生 开始 -->
+  <div class="layui-form-item">
+  <label class="layui-form-label">医生</label>
+      <div class="layui-input-block"> 
+      <input type="text" name="YsName"  class="layui-input">
+    </div>
+  </div>
+<!-- 结束 -->
+<!-- 复核 开始 -->
+  <div class="layui-form-item">
+  <label class="layui-form-label">复核</label>
+      <div class="layui-input-block"> 
+      <input type="text" name="Zcz_Name"  class="layui-input">
+    </div>
+  </div>
+<!-- 结束 -->
+<!-- 操作员 开始 -->
+  <div class="layui-form-item">
+  <label class="layui-form-label">操作员</label>
+      <div class="layui-input-block"> 
+      <input type="text" name="YsName"  class="layui-input">
+    </div>
+  </div>
+<!-- 结束 -->
+<!-- 隐藏的数据 -->
+  <div class="layui-form-item layui-hide">
+    <input type="text" name="sickid"class="layui-input">
+  </div>
+<!-- 结束 -->
+
+
+
+
+    <div class="layui-form-item layui-hide">
+      <button class="layui-btn" lay-submit lay-filter="LAY-user-role-submit" id="LAY-user-role-submit">提交</button>
+    </div>
+  </div>
+
+  <script src="/admin/layuiadmin/layui/layui.js"></script>  
+  <script>
+  layui.config({
+    base: '/admin/layuiadmin/' //静态资源所在路径
+  }).extend({
+    index: 'lib/index' //主入口模块
+  }).use(['index', 'form'], function(){
+    var $ = layui.$
+    ,form = layui.form
+
+  })
+  </script>
+</body>
+</html>

@@ -1,0 +1,210 @@
+
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>layuiAdmin 后台管理员</title>
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+  <link rel="stylesheet" href=" /admin/layuiadmin/layui/css/layui.css" media="all">
+  <link rel="stylesheet" href=" /admin/layuiadmin/style/admin.css" media="all">
+</head>
+<body>
+
+  <div class="layui-fluid">   
+    <div class="layui-card">
+      <div class="layui-form layui-card-header layuiadmin-card-header-auto">
+		<div class="layui-form-item">
+
+          <div class="layui-inline">
+            <label class="layui-form-label">住院号查询</label>
+			<div class="layui-input-block">
+			  <input type="text" name="title" required id='zyh' lay-verify="required" placeholder="请输入住院号" autocomplete="off" class="layui-input">
+			</div>
+          </div>
+
+   
+
+          <div class="layui-inline">
+            <button class="layui-btn layuiadmin-btn-admin" lay-submit lay-filter="LAY-user-back-search" id="s_zybh">
+              <i class="layui-icon layui-icon-search layuiadmin-button-btn"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="layui-card-body">
+<div id="editor" style="display:none">
+  <a class="layui-btn layui-btn-xs" lay-event="edi">编辑</a>
+</div>
+<script type="text/html" id="toolbarcount">
+  <div class="layui-btn-container">
+    <button class="layui-btn layui-btn-sm" lay-event="getCheckData" id="info_counts">数据量</button> 
+	<button class="layui-btn layui-btn-sm" lay-event="getCheckData" id="info_sick">患者信息</button>
+  </div>
+   
+</script>
+ 
+        <table id="yyyy_info" lay-filter="yyyy_users"></table>  
+
+  
+      </div>
+    </div>
+  </div>
+
+ <script src=" /admin/layuiadmin/layui/layui.js"></script>  
+  <script>
+    layui.use(['laydate','table','form'], function(){
+      var laydate = layui.laydate;
+      var table = layui.table;
+      var $ = layui.$;
+      var apitoken=layui.sessionData('gordon');
+      var token=apitoken.token;
+      
+      //执行一个laydate实例
+      laydate.render({
+        elem: '#st',
+      });
+      laydate.render({
+        elem: '#et',
+      });
+
+  table.render({
+    elem: '#yyyy_info'
+    ,height: 'auto'
+    ,url: 'http://192.168.102.104/index.php/api/api/yyyy_zyhone' //数据接口
+    //,page: false //开启分页
+    ,cols: [[ //表头
+	   {field: 'yzid', title: 'ID',  width: 100}
+	  ,{field: 'orderby', title: '排序',width: 150}
+      ,{field: 'dtInput', title: '开单时间',width: 200}
+	  ,{field: 'feeName', title: '医嘱',width:230}
+	  ,{field: 'Gg', title: '计量',width:75}
+      ,{field: 'frequency', title: '频次',width:58}
+	  ,{field: 'Start_dt', title: '首日起始时间',width: 220}
+	  ,{field: 'FirstTimes', title: '执首',width:58}
+	  ,{field: 'EndTimes', title: '执末',width:58}
+	 // ,{field: 'pishi', title: '皮试标记'}
+	 // ,{field: 'Psjg', title: '皮试结果'}
+	 //,{field: 'End_dt', title: '停止时间',width: 180}
+	  ,{field: 'YsName', title: '医生',width:80} 
+	  //,{field: 'StopChkOpName', title: '停止医生'}
+	  ,{field: 'Zcz_Name', title: '复核',width:80}
+ 	  //,{field: 'yztype', title: '停止确认',width:58}
+	  ,{field: 'yztype', title: '封存'}
+	// ,{field: 'Status', title: '状态'}
+	  ,{field: 'SExecTime', title: '执行计划'}
+	  ,{field: 'YsName', title: '操作员',width:80}
+	  ,{ title:'操作', toolbar: '#editor',align:"center",width:80}
+    ]]
+    ,toolbar:"#toolbarcount"
+    ,done:function(res)
+    {
+		 for (var i=0;i<res.data.length;i++)   //遍历返回数据
+        {
+            if(res.data[i].Status==-1)    //设置条件
+            {
+			  //console.log(111)
+                $(".layui-table tr").eq(i+1).css({'color':'red','text-decoration':'line-through'})    //改变满足条件行的颜色
+            }
+			else
+			{
+			   $(".layui-table tr").eq(i+1).css({'color':'green'})  
+			}
+        }
+		if(res.info.Name)
+		{
+			$("#info_sick").text(res.info.Name+"/ "+res.info.Sex+"/ "+res.info.AreaName+"/"+res.info.ComeDiagnosis) 	
+		}
+      $("#info_counts").text('共有 '+res.count+' 条数据') 
+	  
+    }
+  });
+
+     
+
+        $("#s_zybh").on("click",function()
+        {
+			
+			var zyh=$("#zyh").val();
+			table.reload("yyyy_info", {
+				  url: 'http://192.168.102.104/index.php/api/api/yyyy_zyhone'
+				  ,where: {"zybh":zyh} 
+				});
+
+        })
+
+
+
+
+
+
+        //表格监听（编辑和删除）
+table.on('tool(yyyy_users)', function(obj){ //注：tool 是工具条事件名，yyyy_users 是 table 原始容器的属性 lay-filter="对应的值"
+  var data = obj.data; //获得当前行数据
+  var layEvent = obj.event; //获得 lay-event 对应的值（也可以是表头的 event 参数对应的值）
+  var tr = obj.tr; //获得当前行 tr 的 DOM 对象（如果有的话）
+ if(layEvent === 'edi'){ //编辑
+  layer.open({
+          type: 2
+          ,title: '修改医嘱'
+          ,content: 'yz_editform.html'
+          ,area: ['680px', '650px']
+          ,btn: ['确定', '取消']
+      ,success:function(layero,index)
+      {
+        var body = layer.getChildFrame('body', index);  //巧妙的地方在这里哦
+        //开始赋值
+        console.log(data);
+        body.find("input[name='yzid']").val(data.yzid)
+        body.find("input[name='orderby']").val(data.orderby)
+        body.find("input[name='dtInput']").val(data.dtInput)
+
+        body.find("input[name='feeName']").val(data.feeName)
+        body.find("input[name='Gg']").val(data.Gg)
+        body.find("input[name='frequency']").val(data.frequency)
+
+        body.find("input[name='Start_dt']").val(data.Start_dt)
+        body.find("input[name='YsName']").val(data.YsName)
+        body.find("input[name='Zcz_Name']").val(data.Zcz_Name)
+        body.find("input[name='YsName']").val(data.YsName)    
+        body.find("input[name='sickid']").val(data.sickid)      
+      }
+          ,yes: function(index, layero){
+            var iframeWindow = window['layui-layer-iframe'+ index];
+            var submit = layero.find('iframe').contents().find("#LAY-user-role-submit");
+            //监听提交
+            iframeWindow.layui.form.on('submit(LAY-user-role-submit)', function(data){
+              var field = data.field; //获取提交的字段
+              
+              //提交 Ajax 成功后，静态更新表格中的数据
+              //$.ajax({});     
+        $.post("http://192.168.102.104/index.php/api/api/yyyy_zyhone_updata",field,function(res)
+        {
+          if(res.code==200)
+          {
+          layer.msg("添加成功",{icon:1,time:1500},function()
+          {
+              table.reload('yyyy_info');
+              layer.close(index); //关闭弹层
+          });
+
+          }
+        },"json")
+
+            });    
+            submit.trigger('click');
+          }
+        });
+    
+}
+});
+
+    });
+
+  </script>
+</body>
+</html>
+

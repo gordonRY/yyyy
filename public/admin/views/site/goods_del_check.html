@@ -1,0 +1,91 @@
+
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>云阳医院 物资列表</title>
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+  <link rel="stylesheet" href="/admin/layuiadmin/layui/css/layui.css" media="all">
+  <link rel="stylesheet" href="/admin/layuiadmin/style/admin.css" media="all">
+  <style>
+.layui-table-cell {
+            height: 100%;
+            max-width: 100%;
+        }
+    .layui-table img {
+    max-width: 30px;
+}
+  </style>
+</head>
+<body>
+
+  <div class="layui-fluid">   
+    <div class="layui-card">
+      <div class="layui-card-body">
+        <table id="LAY-user-back-role" lay-filter="LAY-user-back-role"></table>  
+     <div class="layui-form-item layui-hide">
+      <input type="text" name="fid"  value=""   class="layui-input" id='fid'>
+    </div>
+      </div>
+    </div>
+  </div>
+  
+
+ <script src="/admin/layuiadmin/layui/layui.js"></script> 
+  <script>
+  layui.use(['table'], function(){
+    var $ = layui.$
+    ,form = layui.form
+    ,table = layui.table
+var fid=$("#fid").val();
+
+//表格初始化
+  table.render({
+    elem: '#LAY-user-back-role'
+    ,url: 'http://192.168.102.104/index.php/api/api/goods_del_check' //数据接口
+  //  ,page: false 
+	,where:{fid:fid}
+    ,cols: [[ //表头
+      {field: 'id', title: 'ID', fixed: 'left',align:"center",width:'8%'}
+      ,{field: 'where_g', title: '地点',width:'20%'}
+      ,{field: 'who_g', title: '使用者',width:'15%'}
+      ,{field: 'why_g', title: '原因' ,align:"left"} 
+      ,{field: 'add_time', title: '添加时间',width:'12%',align:"center"} 
+      ,{field: 'num', title: '数量',width:'8%',align:"center"} 
+      ,{field: 'mark', title: '备注',align:"center",width:'15%',edit:'text'} 
+    ]]
+  });
+
+    table.on('edit(LAY-user-back-role)', function(obj){
+    var value = obj.value //得到修改后的值
+    ,data = obj.data //得到所在行所有键值
+    ,id=data.id
+    data={'id':id,'mark':value};
+    $.post("http://192.168.102.104/index.php/api/api/goods_d_mark",data,function(res)
+    {
+      // code=res.code;
+      // if(code==200)
+      // {
+      //    table.reload('gordon');
+      // }
+    },'json')
+  });
+
+
+
+  
+
+
+
+
+
+
+
+  });
+  </script>
+</body>
+</html>
+

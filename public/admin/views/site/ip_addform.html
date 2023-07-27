@@ -1,0 +1,143 @@
+
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>layuiAdmin 网站管理 iframe 框</title>
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+  <link rel="stylesheet" href="/admin/layuiadmin/layui/css/layui.css" media="all">
+</head>
+<style>
+    .layui-form-select dl { max-height:200px; }
+</style>
+<body>
+
+  <div class="layui-form" lay-filter="layuiadmin-form-role" id="layuiadmin-form-role" style="padding: 20px 30px 0 0;" enctype='multipart/form-data'>
+	<!-- 网站名称开始 -->
+  <div class="layui-form-item">
+    <label class="layui-form-label">名称</label>
+    <div class="layui-input-block">
+      <input type="text" name="ip_name" required  lay-verify="required"  autocomplete="off" class="layui-input"  id="bou">
+    </div>
+  </div>
+  <!-- 结束 -->
+
+      <!-- 网段 开始 -->
+      <div class="layui-form-item">
+          <label class="layui-form-label">网段</label>
+          <div class="layui-input-block">
+              <select name="wd" id="isel" lay-filter="gordon" lay-verify="required" style="height:100px">
+                  <option value="">请选择</option>
+              </select>
+          </div>
+      </div>
+      <!-- 结束 -->
+
+
+
+  	<!-- IP地址 开始 -->
+  <div class="layui-form-item">
+    <label class="layui-form-label">IP地址</label>
+    <div class="layui-input-block">
+      <input type="text" name="ip_addr" lay-verify="required" autocomplete="off" class="layui-input" id="id_address">
+    </div>
+  </div>
+  <!-- 结束 -->
+
+    <!-- mac开始 -->
+  <div class="layui-form-item">
+    <label class="layui-form-label">MAC地址</label>
+    <div class="layui-input-block">
+      <input type="text" name="mac"  autocomplete="off" class="layui-input">
+    </div>
+  </div>
+  <!-- 结束 -->
+
+      <!-- 备注开始 -->
+      <div class="layui-form-item">
+          <label class="layui-form-label">地点</label>
+          <div class="layui-input-block">
+              <input type="text" name="mark"  autocomplete="off" class="layui-input">
+          </div>
+      </div>
+      <!-- 结束 -->
+      <!-- 备注开始 -->
+      <div class="layui-form-item">
+          <label class="layui-form-label">备注</label>
+          <div class="layui-input-block">
+              <input type="text" name="mark2"  autocomplete="off" class="layui-input">
+          </div>
+      </div>
+      <!-- 结束 -->
+
+    <div class="layui-form-item layui-hide">
+      <input type="text" name="id"  value=""   class="layui-input">
+    </div>
+
+
+
+
+
+    <div class="layui-form-item layui-hide">
+      <button class="layui-btn" lay-submit lay-filter="LAY-user-role-submit" id="LAY-user-role-submit">提交</button>
+    </div>
+  </div>
+
+  <script src="/admin/layuiadmin/layui/layui.js"></script>  
+  <script>
+  layui.config({
+    base: '/admin/layuiadmin/' //静态资源所在路径
+  }).extend({
+    index: 'lib/index' //主入口模块
+  }).use(['index', 'form'], function(){
+      var $ = layui.$
+      form = layui.form
+
+
+
+
+$.post("http://192.168.102.104/index.php/api/api/subnet_sel",{},function(res)
+      {
+        data=res.data;
+          $.each(data,function(index,item){
+              $('#isel').append(new Option(item.area,item.id+'@'+item.subnet));//往下拉菜单里添加元素
+              form.render();//菜单渲染 把内容加载进去
+          })
+      },'json')
+
+form.on('select(gordon)',function(data)
+{
+        info={"info":data.value};
+        console.log(info);
+        $.post('http://192.168.102.104/index.php/api/api/ip_dhcp',info,function(res)
+        {
+            console.log(res);
+            if(res.code==200)
+            {
+                $("input[name='ip_addr']").val(res.data);
+            }
+            else if(res.code==404)
+            {
+                layer.msg("该网段已全部使用！",{icon:1,time:1000},function()
+                {
+                    layer.close(index); //关闭弹层
+                });
+            }
+
+
+
+        },'json')
+})
+
+
+
+
+
+
+  })
+  </script>
+</body>
+</html>

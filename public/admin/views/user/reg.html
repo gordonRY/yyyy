@@ -1,0 +1,99 @@
+
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>注册 - layuiAdmin</title>
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+  <link rel="stylesheet" href="../../layuiadmin/style/login.css" media="all">
+  <link rel="stylesheet" href=" /admin/layuiadmin/layui/css/layui.css" media="all">
+  
+</head>
+<body>
+
+
+  <div class="layadmin-user-login layadmin-user-display-show" id="LAY-user-login" style="display: none;">
+    <div class="layadmin-user-login-main">
+      <div class="layadmin-user-login-box layadmin-user-login-header">
+        <h2>layuiAdmin</h2>
+        <p>layui 官方出品的单页面后台管理模板系统</p>
+      </div>
+      <div class="layadmin-user-login-box layadmin-user-login-body layui-form">
+        <div class="layui-form-item">
+          <label class="layadmin-user-login-icon layui-icon layui-icon-username"></label>
+          <input type="text" name="username" id="yyyy-username" lay-verify="nickname" placeholder="用户名" class="layui-input">
+        </div>
+ 
+        <div class="layui-form-item">
+          <label class="layadmin-user-login-icon layui-icon layui-icon-password"></label>
+          <input type="password" name="password" id="yyyy-password" lay-verify="pass" placeholder="密码" class="layui-input">
+        </div>
+        <div class="layui-form-item">
+          <label class="layadmin-user-login-icon layui-icon layui-icon-password"></label>
+          <input type="password" name="repass" id="LAY-user-login-repass" lay-verify="required" placeholder="确认密码" class="layui-input">
+        </div>
+        <div class="layui-form-item">
+          <button class="layui-btn layui-btn-fluid" lay-submit lay-filter="LAY-user-reg-submit">注 册</button>
+        </div>
+
+      </div>
+    </div>
+    
+    <div class="layui-trans layadmin-user-login-footer">
+    </div>
+
+  </div>
+
+  <script src=" /admin/layuiadmin/layui/layui.js"></script>   
+  <script>
+  layui.use(['form','jquery'], function(){
+    var $ = layui.$
+    ,form = layui.form
+
+    form.render();
+
+    //提交
+    form.on('submit(LAY-user-reg-submit)', function(obj){
+      var field = obj.field;
+      
+      //确认密码
+      if(field.password !== field.repass){
+        return layer.msg('两次密码输入不一致');
+      }
+      $.post('http://192.168.102.104/index.php/api/user/register',field,function(res)
+      {
+        if(res.code==200)
+        {
+          layer.msg("注册成功！");
+          location.href="http://192.168.102.104/admin/views/user/login.html"
+        }
+        else
+        {
+          layer.msg("注册失败！")
+        }
+
+      },"json")
+      
+      //请求接口
+      // admin.req({
+      //   url: ''
+      //   ,data: field
+      //   ,done: function(res){        
+      //     layer.msg('注册成功', {
+      //       offset: '15px'
+      //       ,icon: 1
+      //       ,time: 1000
+      //     }, function(){
+      //       location.href = '/user/login'; //跳转到登入页
+      //     });
+      //   }
+      // });
+    
+    });
+  });
+  </script>
+</body>
+</html>

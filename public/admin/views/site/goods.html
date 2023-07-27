@@ -1,0 +1,255 @@
+
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>云阳医院 物资列表</title>
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+  <link rel="stylesheet" href="/admin/layuiadmin/layui/css/layui.css" media="all">
+  <link rel="stylesheet" href="/admin/layuiadmin/style/admin.css" media="all">
+  <style>
+.layui-table-cell {
+            height: 100%;
+            max-width: 100%;
+        }
+    .layui-table img {
+    max-width: 30px;
+}
+  </style>
+</head>
+<body>
+
+  <div class="layui-fluid">   
+    <div class="layui-card">
+ 
+      <div class="layui-card-body">
+        <div style="padding-bottom: 10px;">
+<!--           <button class="layui-btn layuiadmin-btn-role" data-type="batchdel" id="del_site">删除</button> -->
+          <button class="layui-btn layuiadmin-btn-role" data-type="add" id="add_site">添加物资</button>
+          &nbsp;
+          <div class="layui-form" style="width:200px;display:inline-block">
+ 		   <select name="rolename" lay-filter="gordon"  id='g_fid'>
+       <option value="">全部</option>
+       </select>
+
+          </div>
+
+        </div>
+
+
+        <table id="gordon" lay-filter="LAY-user-back-role"></table>  
+
+<!--         <script type="text/html" id="table-useradmin-admin">
+          <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="edit"><i class="layui-icon layui-icon-edit"></i>编辑</a>
+          <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del"><i class="layui-icon layui-icon-delete"></i>删除</a>
+        </script> -->
+      </div>
+    </div>
+  </div>
+  
+<div id="barDemo" style="display:none">
+  <a class="layui-btn layui-btn-xs" lay-event="add">添加详情</a>
+    <a class="layui-btn layui-btn-xs" lay-event="check">常看详情</a>
+  <!-- <a class="layui-btn layui-btn-xs" lay-event="edi">编辑</a> -->
+  <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+</div>
+ <script src="/admin/layuiadmin/layui/layui.js"></script> 
+  <script>
+  layui.use(['table'], function(){
+    var $ = layui.$
+    ,form = layui.form
+    ,table = layui.table
+
+  //select 下拉框 数据动态展示
+  $.post('http://192.168.102.104/index.php/api/api/goods_select_f',{},function(res)
+  {
+    data=res.data;
+    $.each(data,function(index,item)
+    {
+      $("#g_fid").append(new Option(item.name,item.id))
+      form.render();
+    })
+  },'json')
+
+form.on('select(gordon)',function(data)
+{
+  var fid=data.value;
+  if(fid)
+  {
+        table.reload("gordon", {
+      url: 'http://192.168.102.104/index.php/api/api/goods_fid_search'
+      ,where: {"fid":fid}
+      ,page:{curr:1}//查询的页码从1开始 ！！！！！
+    }); 
+  }
+})
+
+  //监听单元格编辑
+  table.on('edit(LAY-user-back-role)', function(obj){
+    var value = obj.value //得到修改后的值
+    ,data = obj.data //得到所在行所有键值
+    ,id=data.id
+    data={'id':id,'mark':value};
+    $.post("http://192.168.102.104/index.php/api/api/goods_mark",data,function(res)
+    {
+      // code=res.code;
+      // if(code==200)
+      // {
+      //    table.reload('gordon');
+      // }
+    },'json')
+  });
+
+
+      //表格初始化
+  table.render({
+    elem: '#gordon'
+    ,url: 'http://192.168.102.104/index.php/api/api/goods_total' //数据接口
+    ,page: true //开启分页
+    ,cols: [[ //表头
+      {field: 'id', title: 'ID', width:'10%', sort: true, fixed: 'left',align:"center"}
+      ,{field: 'name', title: '名称'}
+      ,{field: 'num', title: '数量'}
+      ,{field: 'dhdate', title: '到货时间' ,align:"center"} 
+    ,{field: 'sy_num', title: '剩余数量', align:"center"} 
+    ,{field: 'mark', title: '备注', align:"center",edit:'text'} 
+    ,{fixed: 'right', title:'操作', toolbar: '#barDemo',align:"center"}
+    ]]
+  });
+
+  
+//表格监听（编辑和删除）
+table.on('tool(LAY-user-back-role)', function(obj){ //注：tool 是工具条事件名，LAY-user-back-role 是 table 原始容器的属性 lay-filter="对应的值"
+  var data = obj.data; //获得当前行数据
+  var layEvent = obj.event; //获得 lay-event 对应的值（也可以是表头的 event 参数对应的值）
+  var tr = obj.tr; //获得当前行 tr 的 DOM 对象（如果有的话）
+ if(layEvent === 'del')
+   { //删除
+     layer.confirm('确定要删除？',{icon:5} ,function(index)
+   {
+      obj.del(); //删除对应行（tr）的DOM结构，并更新缓存
+      layer.close(index);
+      //向服务端发送删除指令
+    var id={"id":data.id};
+    $.post("http://192.168.102.104/index.php/api/api/goods_del",id,function(res)
+    {
+      code=res.code;
+      if(code==505)
+      {
+        layer.msg("无法删除，存在下级",{icon:7,time:1500})
+         table.reload('gordon');
+      }
+    },'json')
+
+    });
+  } 
+else if(layEvent === 'add')
+{
+  if(data.sy_num<=0)
+  {
+    layer.msg("剩余数量为0，无法添加",{icon:7,time:1500})
+    return;
+  }
+  layer.open({
+          type: 2
+          ,title: '添加物资详情'
+          ,content: 'goods_del_add.html'
+          ,area: ['500px', '390px']
+          ,btn: ['确定', '取消']
+      ,success:function(layero,index)
+      {
+        var body = layer.getChildFrame('body', index);  //巧妙的地方在这里哦
+        //开始赋值
+        body.find("input[name='fid']").val(data.id)
+        body.find("input[name='sy_num']").val(data.sy_num)
+        
+      }
+          ,yes: function(index, layero){
+            var iframeWindow = window['layui-layer-iframe'+ index];
+            var submit = layero.find('iframe').contents().find("#LAY-user-role-submit");
+            //监听提交
+            iframeWindow.layui.form.on('submit(LAY-user-role-submit)', function(data){
+              var field = data.field; //获取提交的字段
+              
+              //提交 Ajax 成功后，静态更新表格中的数据
+              //$.ajax({});     
+        $.post("http://192.168.102.104/index.php/api/api/goods_del_add",field,function(res)
+        {
+          if(res.code==200)
+          {
+          layer.msg("修改成功",{icon:1,time:1500},function()
+          {
+                    table.reload('gordon');
+              layer.close(index); //关闭弹层
+          });
+
+          }
+        },"json")
+
+            });    
+            submit.trigger('click');
+          }
+        });
+}
+else if(layEvent === 'check')
+{
+    layer.open({
+          type: 2
+          ,title: '物资详情'
+          ,content: 'goods_del_check.html'
+          ,area: ['1000px', '400px']
+        //  ,btn: ['确定', '取消']
+      ,success:function(layero,index)
+      {
+        var body = layer.getChildFrame('body', index);  //巧妙的地方在这里哦
+        //开始赋值
+        body.find("input[name='fid']").val(data.id)   
+      }
+        });
+}
+});
+  //添加数据 开始
+  $("#add_site").on("click",function()
+  {
+    layer.open({
+          type: 2
+          ,title: '添加新物资'
+          ,content: 'goods_editform.html'
+          ,area: ['500px', '480px']
+          ,btn: ['确定', '取消']
+          ,yes: function(index, layero){
+            var iframeWindow = window['layui-layer-iframe'+ index]
+            ,submit = layero.find('iframe').contents().find("#LAY-user-role-submit");
+            //监听提交
+            iframeWindow.layui.form.on('submit(LAY-user-role-submit)', function(data){
+              var field = data.field; //获取提交的字段
+   
+        $.post("http://192.168.102.104/index.php/api/api/goods_insert",field,function(res)
+        {
+          if(res.code==200)
+          {
+          layer.msg("添加成功",{icon:1,time:1000},function()
+          {
+              table.reload('gordon');
+              layer.close(index); //关闭弹层
+          });
+
+          }
+        },"json")
+
+            });    
+            submit.trigger('click');
+          }
+        });
+
+    });
+  //添加数据 结束
+
+  });
+  </script>
+</body>
+</html>
+
